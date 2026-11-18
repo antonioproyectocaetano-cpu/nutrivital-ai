@@ -1,0 +1,14 @@
+{
+  "name": "nutrivital-ai-control-calorias",
+  "version": "1.0.0",
+  "description": "Aplicación web de control inteligente de calorías con Inteligencia Artificial, motor metabólico Mifflin-St Jeor, base de datos BEDCA/USDA y recomendaciones OMS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test/verify-all.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>NutriVital AI — Control Inteligente de Calorías y Asistente Nutricional</title>
+  <meta name="description" content="Aplicación web inteligente de control diario de calorías con reconocimiento de alimentos por fotografía e IA, motor metabólico Mifflin-St Jeor, base de datos BEDCA/USDA y recomendaciones oficiales de la OMS." />
+  <meta name="theme-color" content="#16A34A" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <div id="app-shell" class="app-shell">
+    <!-- CABECERA SUPERIOR -->
+    <header class="top-header">
+      <div class="brand-group" id="brand-home-trigger" title="Ir al panel de inicio">
+        <img src="/assets/icon.svg" alt="NutriVital AI Logo" class="brand-logo" />
+        <div>
+          <h1 class="brand-title">NutriVital AI</h1>
+          <div class="brand-subtitle" id="header-user-greeting">Asistente Nutricional Inteligente</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" id="btn-open-onboarding" class="btn-sm" title="Asistente de configuración inicial o cambiar de cuenta">
+          Asistente / Cuenta
+        </button>
+        <button type="button" id="btn-toggle-layout" class="icon-btn" title="Alternar vista Móvil / Escritorio expandido" aria-label="Alternar ancho de vista">
+          ⇄
+        </button>
+        <button type="button" id="btn-toggle-theme" class="icon-btn" title="Alternar modo claro / oscuro" aria-label="Alternar tema">
+          ☾
+        </button>
+      </div>
+    </header>
+
+    <!-- SELECTOR DE FECHA DIARIA -->
+    <div class="date-navigator">
+      <button type="button" id="btn-prev-day" class="date-nav-btn">◀ Anterior</button>
+      <div class="date-current-pill">
+        <span id="current-date-label">Hoy</span>
+        <input type="date" id="input-date-picker" class="date-input-picker" aria-label="Seleccionar fecha" />
+      </div>
+      <button type="button" id="btn-next-day" class="date-nav-btn">Siguiente ▶</button>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+      <!-- =====================================================================
+           APARTADO 1: INICIO — PANEL PRINCIPAL DE CONTROL DIARIO DE CALORÍAS
+           ===================================================================== -->
+      <section id="screen-dashboard" class="screen-section active" aria-label="Panel principal de calorías">
+        <div class="calorie-hero-card">
+          <div class="card-header" style="margin-bottom: 12px;">
+            <div>
+              <span class="badge badge-green" id="hero-goal-badge">Objetivo personalizado</span>
+            </div>
+            <span class="badge badge-blue" id="hero-bmr-badge" title="Metabolismo basal y gasto energético total">
+              GET: 2.000 kcal
+            </span>
+          </div>
+
+          <div class="hero-ring-layout">
+            <!-- Gráfico circular dinámico -->
+            <div class="ring-wrapper">
+              <svg class="ring-svg" viewBox="0 0 180 180">
+                <circle class="ring-track" cx="90" cy="90" r="74"></circle>
+                <circle id="calorie-ring-progress" class="ring-progress" cx="90" cy="90" r="74" stroke-dasharray="465" stroke-dashoffset="465"></circle>
+              </svg>
+              <div class="ring-center-text">
+                <div id="ring-remaining-number" class="ring-remaining-value">1.150</div>
+                <div id="ring-remaining-label" class="ring-remaining-unit">kcal disponibles</div>
+                <div id="ring-progress-pct" class="ring-pct-pill">43% del objetivo</div>
+              </div>
+            </div>
+
+            <!-- Desglose numérico en tiempo real -->
+            <div class="calorie-stats-column">
+              <div class="calorie-stat-box">
+                <span class="calorie-stat-label">🎯 Objetivo diario</span>
+                <span id="stat-target-kcal" class="calorie-stat-number">2.000 kcal</span>
+              </div>
+              <div class="calorie-stat-box">
+                <span class="calorie-stat-label">🍽️ Consumidas hoy</span>
+                <span id="stat-consumed-kcal" class="calorie-stat-number" style="color: var(--primary);">850 kcal</span>
+              </div>
+              <div class="calorie-stat-box">
+                <span class="calorie-stat-label">⚡ Restantes hoy</span>
+                <span id="stat-remaining-kcal" class="calorie-stat-number">1.150 kcal</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón principal estrella: FOTOGRAFIAR MI COMIDA -->
+          <button type="button" id="btn-hero-photograph" class="cta-photo-primary">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+              <circle cx="12" cy="13" r="3.5"/>
+            </svg>
+            FOTOGRAFIAR MI COMIDA
+          </button>
+        </div>
+
+        <!-- Tarjetas de Macronutrientes -->
+        <div class="macros-grid">
+          <div class="macro-card">
+            <div class="macro-name">
+              <span>Proteínas</span>
+              <span id="macro-protein-pct" style="color: var(--macro-protein);">0%</span>
+            </div>
+            <div id="macro-protein-val" class="macro-value">0 / 110 g</div>
+            <div class="progress-bar-bg">
+              <div id="macro-protein-bar" class="progress-bar-fill" style="width: 0%; background: var(--macro-protein);"></div>
+            </div>
+            <div class="macro-sub">Músculo y saciedad</div>
+          </div>
+
+          <div class="macro-card">
+            <div class="macro-name">
+              <span>Hidratos</span>
+              <span id="macro-carbs-pct" style="color: var(--macro-carbs);">0%</span>
+            </div>
+            <div id="macro-carbs-val" class="macro-value">0 / 210 g</div>
+            <div class="progress-bar-bg">
+              <div id="macro-carbs-bar" class="progress-bar-fill" style="width: 0%; background: var(--macro-carbs);"></div>
+            </div>
+            <div class="macro-sub" id="macro-fiber-sub">Fibra: 0 / 25 g</div>
+          </div>
+
+          <div class="macro-card">
+            <div class="macro-name">
+              <span>Grasas</span>
+              <span id="macro-fat-pct" style="color: var(--macro-fat);">0%</span>
+            </div>
+            <div id="macro-fat-val" class="macro-value">0 / 60 g</div>
+            <div class="progress-bar-bg">
+              <div id="macro-fat-bar" class="progress-bar-fill" style="width: 0%; background: var(--macro-fat);"></div>
+            </div>
+            <div class="macro-sub" id="macro-satfat-sub">Saturadas: 0 g</div>
+          </div>
+        </div>
+
+        <!-- Hidratación y Resumen de Comidas -->
+        <div class="secondary-metrics-grid">
+          <div class="card" style="padding: 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; font-size:0.86rem;">💧 Agua consumida</span>
+              <span id="water-status-text" style="font-family:var(--font-mono); font-weight:800; font-size:0.86rem; color:var(--macro-water);">1.250 / 2.350 ml</span>
+            </div>
+            <div class="progress-bar-bg" style="margin-top:8px;">
+              <div id="water-progress-bar" class="progress-bar-fill" style="width:50%; background:var(--macro-water);"></div>
+            </div>
+            <div class="water-controls">
+              <button type="button" id="btn-water-minus" class="btn-sm">-250 ml</button>
+              <button type="button" id="btn-water-plus" class="btn-sm btn-sm-primary">+250 ml (1 vaso)</button>
+              <span id="water-glasses-count" style="font-size:0.75rem; color:var(--text-muted); margin-left:auto;">5 vasos</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 14px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; font-size:0.86rem;">🥗 Calidad hoy</span>
+              <span id="meals-count-badge" class="badge badge-green">2 comidas</span>
+            </div>
+            <div style="font-size:0.78rem; color:var(--text-secondary); margin: 6px 0;">
+              Frutas y verduras: <strong id="dash-fruit-veg-g">200 g</strong> / 400 g OMS
+            </div>
+            <button type="button" id="btn-quick-manual-add" class="btn-sm" style="width:100%;">
+              + Añadir alimento rápido
+            </button>
+          </div>
+        </div>
+
+        <!-- Consejos Inteligentes Personalizados y Directrices OMS -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🧠 Consejos Inteligentes y Criterios OMS</h2>
+            <span class="badge badge-green">Tiempo real</span>
+          </div>
+          <div id="who-tips-container" class="tips-list"></div>
+
+          <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px;">
+              Indicadores diarios frente a recomendaciones oficiales de la OMS:
+            </div>
+            <div id="who-indicators-container" class="who-indicators-list"></div>
+          </div>
+        </div>
+
+        <!-- Historial de comidas del día -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🕒 Comidas registradas del día</h2>
+            <button type="button" id="btn-add-meal-from-list" class="btn-sm btn-sm-primary">+ Registrar</button>
+          </div>
+          <div id="dashboard-meals-list" class="meals-timeline"></div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           APARTADO 2: REGISTRAR COMIDA — CÁMARA IA, BUSCADOR BEDCA Y ESCÁNER
+           ===================================================================== -->
+      <section id="screen-camera" class="screen-section" aria-label="Fotografiar y registrar comida">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📸 Registrar Comida con IA</h2>
+            <span class="badge badge-green">BEDCA + USDA</span>
+          </div>
+
+          <div class="mode-tabs" role="tablist">
+            <button type="button" class="mode-tab-btn active" data-cam-mode="photo" id="tab-mode-photo">
+              📷 Fotografiar IA
+            </button>
+            <button type="button" class="mode-tab-btn" data-cam-mode="search" id="tab-mode-search">
+              🔍 Buscador / Manual
+            </button>
+            <button type="button" class="mode-tab-btn" data-cam-mode="barcode" id="tab-mode-barcode">
+              🏷️ Código Barras
+            </button>
+          </div>
+
+          <!-- SUB-MODO A: FOTOGRAFIAR COMIDA E IA VISUAL -->
+          <div id="submode-photo" style="margin-top: 14px; display: flex; flex-direction: column; gap: 14px;">
+            <div class="camera-stage" id="camera-stage-box">
+              <video id="camera-video" autoplay playsinline muted style="display:none;"></video>
+              <img id="camera-preview-img" src="/assets/meals/pollo_arroz_ensalada.jpg" alt="Vista previa del plato" />
+              <div class="camera-frame-guide">
+                <span class="camera-guide-label" id="camera-status-caption">Encuadra el plato completo con buena iluminación</span>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button type="button" id="btn-start-live-camera" class="btn-sm" style="padding: 11px;">
+                📹 Activar cámara móvil
+              </button>
+              <label for="file-camera-input" class="btn-sm" style="padding: 11px; text-align:center; display:inline-block; cursor:pointer;">
+                📁 Subir / Hacer foto
+                <input type="file" id="file-camera-input" accept="image/*" capture="environment" style="display:none;" />
+              </label>
+            </div>
+
+            <button type="button" id="btn-capture-frame" class="cta-photo-primary" style="display:none; margin-top:0;">
+              📸 CAPTURAR FOTOGRAFÍA AHORA
+            </button>
+
+            <!-- Platos reales de prueba instantánea -->
+            <div>
+              <div class="form-label" style="margin-bottom: 6px;">
+                O selecciona una fotografía real de ejemplo para analizar al instante:
+              </div>
+              <div class="sample-plates-grid">
+                <button type="button" class="sample-plate-btn" data-preset="pollo_arroz_ensalada" data-img="/assets/meals/pollo_arroz_ensalada.jpg">
+                  <img src="/assets/meals/pollo_arroz_ensalada.jpg" alt="Pollo, arroz y ensalada" />
+                  <span>Pollo a la plancha, arroz y ensalada (568 kcal)</span>
+                </button>
+                <button type="button" class="sample-plate-btn" data-preset="salmon_quinoa_brocoli" data-img="/assets/meals/salmon_quinoa_brocoli.jpg">
+                  <img src="/assets/meals/salmon_quinoa_brocoli.jpg" alt="Salmón, quinoa y brócoli" />
+                  <span>Salmón al horno, quinoa, brócoli y aguacate</span>
+                </button>
+                <button type="button" class="sample-plate-btn" data-preset="tostada_aguacate_huevo" data-img="/assets/meals/tostada_aguacate_huevo.jpg">
+                  <img src="/assets/meals/tostada_aguacate_huevo.jpg" alt="Tostada con aguacate y huevo" />
+                  <span>Tostada integral, aguacate, huevo y frutos rojos</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="input-ai-hint">
+                Contexto opcional o respuesta si la IA no distingue algún ingrediente (ej. «lentejas con verduras y pan integral»):
+              </label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="input-ai-hint" class="form-control" placeholder="Ej: Pechuga de pollo, arroz cocido, ensalada con 10g AOVE..." />
+                <button type="button" id="btn-run-ai-analysis" class="btn-sm btn-sm-primary" style="white-space:nowrap; padding: 0 16px;">
+                  ✨ Analizar con IA
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-MODO B: BUSCADOR BEDCA / USDA Y REGISTRO MANUAL -->
+          <div id="submode-search" style="margin-top: 14px; display: none; flex-direction: column; gap: 14px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <input type="search" id="input-food-search" class="form-control" style="flex:1; min-width:180px;" placeholder="Buscar en BEDCA / USDA (ej. pollo, arroz, lentejas, salmón)..." />
+              <select id="select-food-state" class="form-control" style="width:auto;">
+                <option value="all">Crudo y Cocinado</option>
+                <option value="cooked">Solo Cocinado</option>
+                <option value="raw">Solo Crudo</option>
+                <option value="ready">Listo para consumir</option>
+              </select>
+            </div>
+
+            <div id="search-results-list" style="max-height: 260px; overflow-y: auto; display:flex; flex-direction:column; gap:8px;"></div>
+
+            <details style="border-top: 1px solid var(--border); padding-top: 10px;">
+              <summary style="font-size: 0.82rem; font-weight: 700; cursor: pointer; color: var(--primary);">
+                + Crear alimento manual personalizado
+              </summary>
+              <div class="form-grid" style="margin-top: 10px;">
+                <div class="form-group full">
+                  <label class="form-label">Nombre del alimento o plato</label>
+                  <input type="text" id="custom-food-name" class="form-control" placeholder="Ej: Tortilla de patata casera" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Kcal por 100 g</label>
+                  <input type="number" id="custom-food-kcal" class="form-control" value="185" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Proteínas (g/100g)</label>
+                  <input type="number" id="custom-food-protein" class="form-control" value="8" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Hidratos (g/100g)</label>
+                  <input type="number" id="custom-food-carbs" class="form-control" value="16" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Grasas (g/100g)</label>
+                  <input type="number" id="custom-food-fat" class="form-control" value="10" />
+                </div>
+                <div class="form-group full">
+                  <button type="button" id="btn-save-custom-food" class="btn-sm btn-sm-primary" style="width:100%; padding:10px;">
+                    Guardar alimento y añadir al plato actual
+                  </button>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- SUB-MODO C: ESCÁNER DE CÓDIGOS DE BARRAS (EAN-13) -->
+          <div id="submode-barcode" style="margin-top: 14px; display: none; flex-direction: column; gap: 12px;">
+            <p style="font-size: 0.82rem; color: var(--text-secondary);">
+              Introduce un código de barras EAN-13 o selecciona uno de los códigos verificados para añadir el producto a tu comida:
+            </p>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="input-barcode-ean" class="form-control" placeholder="Código EAN-13 (ej: 8410066001124)" />
+              <button type="button" id="btn-lookup-barcode" class="btn-sm btn-sm-primary">Buscar EAN</button>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <button type="button" class="btn-sm barcode-sample-chip" data-ean="8410066001124">🥫 Atún al natural (8410066001124)</button>
+              <button type="button" class="btn-sm barcode-sample-chip" data-ean="8410500001012">🥛 Yogur natural (8410500001012)</button>
+              <button type="button" class="btn-sm barcode-sample-chip" data-ean="8480000094643">🌾 Copos de avena (8480000094643)</button>
+              <button type="button" class="btn-sm barcode-sample-chip" data-ean="8412600001055">🍞 Pan integral (8412600001055)</button>
+              <button type="button" class="btn-sm barcode-sample-chip" data-ean="8410010001015">🫒 Aceite de oliva AOVE (8410010001015)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL DE RESULTADO DEL ANÁLISIS DE IA Y CONFIRMACIÓN DEL USUARIO -->
+        <div class="card" id="ai-confirmation-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">✅ Confirmación y Edición Nutricional</h2>
+              <p style="font-size:0.75rem; color:var(--text-muted);" id="ai-engine-subtitle">
+                Verifica los alimentos y gramos estimados antes de descontarlos de tu objetivo diario
+              </p>
+            </div>
+            <span id="ai-confidence-badge" class="badge badge-green">Confianza IA: Alta (92%)</span>
+          </div>
+
+          <!-- Aviso de honestidad científica sobre estimación visual de peso en 2D -->
+          <div id="ai-honesty-banner" class="tip-banner warning" style="margin-bottom: 12px;">
+            <div>
+              <div class="tip-title">⚖️ Estimación de peso aproximada y preguntas de confirmación</div>
+              <div id="ai-notes-text" class="tip-message">
+                La IA no puede conocer con exactitud física el peso a partir de una fotografía 2D. Revisa las cantidades y confirma si lleva aceite o salsas.
+              </div>
+              <ul id="ai-questions-list" style="margin-top:6px; padding-left:18px; font-size:0.78rem; color:var(--text-secondary);"></ul>
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-bottom: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="confirm-meal-title">Nombre de la comida</label>
+              <input type="text" id="confirm-meal-title" class="form-control" value="Pechuga de pollo a la plancha, arroz y ensalada" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="confirm-meal-type">Categoría de comida</label>
+              <select id="confirm-meal-type" class="form-control">
+                <option value="breakfast">🌅 Desayuno</option>
+                <option value="mid_morning">🍎 Media mañana</option>
+                <option value="lunch" selected>☀️ Comida</option>
+                <option value="snack">🥨 Merienda</option>
+                <option value="dinner">🌙 Cena</option>
+                <option value="other">🍽️ Otros</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tabla interactiva de ingredientes (permite editar gramos, alternar crudo/cocinado y eliminar) -->
+          <div class="ai-table-wrapper">
+            <table class="ai-items-table">
+              <thead>
+                <tr>
+                  <th>Alimento (Fuente)</th>
+                  <th>Estado</th>
+                  <th style="text-align:right;">Cantidad (g)</th>
+                  <th style="text-align:right;">Calorías</th>
+                  <th style="text-align:right;">P / H / G</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="ai-items-tbody"></tbody>
+              <tfoot>
+                <tr style="font-weight:800; background:var(--bg-subtle);">
+                  <td colspan="3">TOTAL ESTIMADO DE LA COMIDA</td>
+                  <td id="ai-total-kcal-cell" style="text-align:right; font-family:var(--font-mono); color:var(--primary); font-size:0.98rem;">568 kcal</td>
+                  <td id="ai-total-macros-cell" style="text-align:right; font-family:var(--font-mono); font-size:0.76rem;">50P / 47H / 19G</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Botones rápidos para añadir aceites, salsas y acompañamientos (Sección 4) -->
+          <div style="margin-top: 12px;">
+            <div class="form-label" style="margin-bottom: 6px;">
+              Añadir salsas, aceites o acompañamientos que no se ven a simple vista:
+            </div>
+            <div class="quick-Condiments-bar">
+              <button type="button" class="btn-sm quick-add-item-btn" data-food-id="aceite_oliva" data-grams="10">+10g Aceite de oliva (90 kcal)</button>
+              <button type="button" class="btn-sm quick-add-item-btn" data-food-id="salsa_tomate_casera" data-grams="50">+50g Salsa de tomate (39 kcal)</button>
+              <button type="button" class="btn-sm quick-add-item-btn" data-food-id="vinagreta_ligera" data-grams="12">+12g Vinagreta (53 kcal)</button>
+              <button type="button" class="btn-sm quick-add-item-btn" data-food-id="pan_integral" data-grams="40">+40g Pan integral (99 kcal)</button>
+              <button type="button" class="btn-sm quick-add-item-btn" data-food-id="ensalada_mixta" data-grams="100">+100g Ensalada (35 kcal)</button>
+              <button type="button" class="btn-sm quick-add-item-btn" data-food-id="manzana" data-grams="160">+160g Manzana (83 kcal)</button>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:600; cursor:pointer;">
+              <input type="checkbox" id="chk-save-favorite" />
+              ⭐ Guardar en mis comidas habituales
+            </label>
+
+            <button type="button" id="btn-confirm-save-meal" class="cta-photo-primary" style="margin-top:0; flex:1; min-width:220px;">
+              ✓ CONFIRMAR Y DESCONTAR CALORÍAS
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           APARTADO 3: ESTADÍSTICAS SEMANALES, MENSUALES (30/60/90 DÍAS) Y OMS
+           ===================================================================== -->
+      <section id="screen-stats" class="screen-section" aria-label="Estadísticas y evolución nutricional">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📊 Evolución y Estadísticas</h2>
+            <div style="display:flex; gap:5px;">
+              <button type="button" class="btn-sm stats-range-btn active" data-days="7">7 días</button>
+              <button type="button" class="btn-sm stats-range-btn" data-days="30">30 días</button>
+              <button type="button" class="btn-sm stats-range-btn" data-days="60">60 días</button>
+              <button type="button" class="btn-sm stats-range-btn" data-days="90">90 días</button>
+            </div>
+          </div>
+
+          <div class="macros-grid" style="margin-bottom: 14px;">
+            <div class="macro-card">
+              <span class="macro-name">Promedio diario</span>
+              <span id="stats-avg-kcal" class="macro-value">1.680 kcal</span>
+              <span id="stats-vs-prev" class="macro-sub">vs periodo anterior</span>
+            </div>
+            <div class="macro-card">
+              <span class="macro-name">Cumplimiento</span>
+              <span id="stats-compliance-pct" class="macro-value" style="color:var(--primary);">92%</span>
+              <span id="stats-balance-sub" class="macro-sub">Balance medio</span>
+            </div>
+            <div class="macro-card">
+              <span class="macro-name">Fruta y verdura</span>
+              <span id="stats-avg-fruitveg" class="macro-value">395 g/día</span>
+              <span class="macro-sub">Meta OMS: ≥400 g</span>
+            </div>
+          </div>
+
+          <div style="font-size:0.82rem; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">
+            Consumo calórico diario vs. Objetivo calórico:
+          </div>
+          <div id="stats-calorie-chart" class="chart-svg-container"></div>
+
+          <div style="margin-top:16px; display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; text-align:center;">
+            <div style="background:var(--bg-subtle); padding:10px; border-radius:10px;">
+              <div style="font-size:0.72rem; color:var(--text-muted);">Proteínas medias</div>
+              <div id="stats-macro-p" style="font-weight:800; font-family:var(--font-mono); color:var(--macro-protein);">98 g (24%)</div>
+            </div>
+            <div style="background:var(--bg-subtle); padding:10px; border-radius:10px;">
+              <div style="font-size:0.72rem; color:var(--text-muted);">Hidratos medios</div>
+              <div id="stats-macro-c" style="font-weight:800; font-family:var(--font-mono); color:var(--macro-carbs);">172 g (46%)</div>
+            </div>
+            <div style="background:var(--bg-subtle); padding:10px; border-radius:10px;">
+              <div style="font-size:0.72rem; color:var(--text-muted);">Grasas medias</div>
+              <div id="stats-macro-f" style="font-weight:800; font-family:var(--font-mono); color:var(--macro-fat);">54 g (30%)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Evolución del peso corporal y registro periódico -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">⚖️ Evolución del Peso Corporal</h2>
+            <span id="weight-target-badge" class="badge badge-blue">Meta: 62.5 kg</span>
+          </div>
+          <div id="stats-weight-chart" class="chart-svg-container"></div>
+
+          <form id="form-log-weight" style="margin-top: 12px; display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+            <div class="form-group" style="flex:1; min-width:120px;">
+              <label class="form-label" for="input-new-weight">Registrar peso hoy (kg)</label>
+              <input type="number" step="0.1" id="input-new-weight" class="form-control" placeholder="Ej: 67.2" required />
+            </div>
+            <div class="form-group" style="flex:1.5; min-width:150px;">
+              <label class="form-label" for="input-weight-note">Nota (opcional)</label>
+              <input type="text" id="input-weight-note" class="form-control" placeholder="En ayunas" />
+            </div>
+            <button type="submit" class="btn-sm btn-sm-primary" style="height:40px; padding:0 16px;">
+              Guardar peso
+            </button>
+          </form>
+        </div>
+
+        <!-- Guía de Recomendaciones Oficiales de la OMS (Sección 6) -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🌍 Directrices Oficiales de la OMS</h2>
+            <span class="badge badge-green">Rigor Científico</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">
+            Las ecuaciones metabólicas individuales de esta aplicación (como <strong>Mifflin-St Jeor</strong> para el TMB) proceden de la literatura clínica nutricional y no se atribuyen a la OMS. Las recomendaciones de calidad alimentaria siguientes sí corresponden a las directrices oficiales de la <strong>Organización Mundial de la Salud</strong>:
+          </p>
+          <div style="display:grid; grid-template-columns:1fr; gap:8px; font-size:0.8rem;">
+            <div class="tip-banner positive">
+              <div>
+                <div class="tip-title">🥦 Frutas y verduras (≥ 400 g diarios)</div>
+                <div class="tip-message">Consumir al menos 5 porciones (400 g) de frutas y hortalizas al día (excluyendo patatas y otros tubérculos feculentos).</div>
+              </div>
+            </div>
+            <div class="tip-banner info">
+              <div>
+                <div class="tip-title">🫘 Legumbres, cereales integrales y frutos secos</div>
+                <div class="tip-message">Base de hidratos de absorción lenta, proteínas vegetales y al menos 25 g diarios de fibra dietética natural.</div>
+              </div>
+            </div>
+            <div class="tip-banner warning">
+              <div>
+                <div class="tip-title">🍯 Azúcares libres (&lt; 10 % e idealmente &lt; 5 % de la energía total)</div>
+                <div class="tip-message">Limitar refrescos, bollería y azúcares añadidos. Los azúcares intrínsecos de la fruta entera fresca no son azúcares libres.</div>
+              </div>
+            </div>
+            <div class="tip-banner warning">
+              <div>
+                <div class="tip-title">🫒 Grasas saludables y control de sal (&lt; 5 g/día)</div>
+                <div class="tip-message">Priorizar grasas insaturadas (aceite de oliva virgen extra, pescado azul, aguacate, frutos secos), limitar saturadas (&lt;10%), evitar grasas trans (&lt;1%) y mantener la sal por debajo de 5 g diarios.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           APARTADO 4: HISTORIAL DIARIO, COMIDAS HABITUALES Y EXPORTACIÓN
+           ===================================================================== -->
+      <section id="screen-history" class="screen-section" aria-label="Historial de comidas y favoritos">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">⭐ Comidas Habituales (Repetir en 1 clic)</h2>
+            <span class="badge badge-green">Rápido</span>
+          </div>
+          <p style="font-size:0.79rem; color:var(--text-secondary); margin-bottom:10px;">
+            Vuelve a registrar tus platos frecuentes en el día actual sin necesidad de repetir la fotografía:
+          </p>
+          <div id="favorites-meals-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📅 Registro Detallado del Día Seleccionado</h2>
+            <div style="display:flex; gap:6px;">
+              <a href="/api/export?format=csv" class="btn-sm" download>⬇ CSV</a>
+              <a href="/api/export?format=json" class="btn-sm" download>⬇ JSON (RGPD)</a>
+            </div>
+          </div>
+          <div id="history-day-summary-box" style="margin-bottom: 12px; font-size:0.82rem; color:var(--text-secondary);"></div>
+          <div id="history-meals-list" class="meals-timeline"></div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           APARTADO 5: MI PERFIL, MOTOR METABÓLICO, RECORDATORIOS Y RGPD
+           ===================================================================== -->
+      <section id="screen-profile" class="screen-section" aria-label="Mi perfil y configuración">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">👤 Perfil Personal y Motor Metabólico</h2>
+            <span class="badge badge-green">Mifflin-St Jeor</span>
+          </div>
+
+          <form id="form-user-profile" class="form-grid">
+            <div class="form-group full">
+              <label class="form-label" for="prof-name">Nombre</label>
+              <input type="text" id="prof-name" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prof-age">Edad (años)</label>
+              <input type="number" id="prof-age" class="form-control" min="10" max="110" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prof-sex">Sexo biológico (ecuación TMB)</label>
+              <select id="prof-sex" class="form-control">
+                <option value="female">Mujer</option>
+                <option value="male">Hombre</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prof-height">Altura (cm)</label>
+              <input type="number" id="prof-height" class="form-control" min="100" max="240" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prof-weight">Peso actual (kg)</label>
+              <input type="number" step="0.1" id="prof-weight" class="form-control" min="25" max="300" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prof-target-weight">Peso objetivo opcional (kg)</label>
+              <input type="number" step="0.1" id="prof-target-weight" class="form-control" min="25" max="300" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prof-goal">Objetivo personal</label>
+              <select id="prof-goal" class="form-control">
+                <option value="maintain">Mantener mi peso actual</option>
+                <option value="lose">Perder peso de forma progresiva</option>
+                <option value="gain">Ganar peso</option>
+                <option value="improve_habits">Mejorar mis hábitos alimenticios</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label class="form-label" for="prof-activity">Nivel de actividad física diaria</label>
+              <select id="prof-activity" class="form-control">
+                <option value="sedentary">Sedentario: poca actividad física</option>
+                <option value="light">Ligero: actividad física ocasional</option>
+                <option value="moderate">Moderado: ejercicio entre 3 y 5 días por semana</option>
+                <option value="high">Alto: ejercicio intenso y frecuente</option>
+                <option value="very_high">Muy alto: actividad física o trabajo físico muy exigente</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prof-work">Tipo de actividad laboral</label>
+              <select id="prof-work" class="form-control">
+                <option value="sedentary">Sedentaria / Oficina</option>
+                <option value="standing">De pie / Comercio / Docencia</option>
+                <option value="walking">Caminata activa / Hostelería</option>
+                <option value="heavy">Trabajo físico exigente</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prof-exercise">Frecuencia de ejercicio semanal</label>
+              <select id="prof-exercise" class="form-control">
+                <option value="none">0 días / semana</option>
+                <option value="1_2_days">1 a 2 días / semana</option>
+                <option value="3_4_days">3 a 4 días / semana</option>
+                <option value="5_6_days">5 a 6 días / semana</option>
+                <option value="daily">Todos los días</option>
+              </select>
+            </div>
+
+            <!-- Precauciones clínicas especiales (Sección 11) -->
+            <div class="form-group full" style="background:var(--bg-subtle); padding:12px; border-radius:12px; border:1px solid var(--border);">
+              <div class="form-label" style="margin-bottom:6px;">
+                ⚕️ Situaciones que requieren protección nutricional no restrictiva (Sección 11):
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.79rem;">
+                <label><input type="checkbox" id="cond-pregnancy" /> Embarazo</label>
+                <label><input type="checkbox" id="cond-lactation" /> Lactancia</label>
+                <label><input type="checkbox" id="cond-tca" /> Historial / riesgo de TCA</label>
+                <label><input type="checkbox" id="cond-medical" /> Patología con supervisión médica</label>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <button type="submit" class="cta-photo-primary" style="margin-top:4px;">
+                💾 GUARDAR Y RECALCULAR NECESIDADES CALÓRICAS
+              </button>
+            </div>
+          </form>
+
+          <!-- Resultado detallado de los cálculos metabólicos -->
+          <div id="profile-metabolic-results" style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);"></div>
+        </div>
+
+        <!-- Recordatorios de comidas e hidratación -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🔔 Recordatorios Inteligentes</h2>
+            <button type="button" id="btn-test-reminder" class="btn-sm">Probar aviso</button>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label"><input type="checkbox" id="rem-meals" checked /> Recordatorios de comidas</label>
+              <span style="font-size:0.74rem; color:var(--text-muted);">Desayuno 08:30 · Comida 14:00 · Cena 21:00</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label"><input type="checkbox" id="rem-water" checked /> Recordatorio de hidratación</label>
+              <span style="font-size:0.74rem; color:var(--text-muted);">Aviso periódico cada 2 horas</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seguridad, Privacidad RGPD y Limitaciones Médicas (Sección 11) -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🛡️ Privacidad RGPD y Aviso Médico</h2>
+            <span class="badge badge-blue">UE 2016/679</span>
+          </div>
+          <p style="font-size:0.79rem; color:var(--text-secondary); margin-bottom:12px;">
+            <strong>Limitación médica:</strong> NutriVital AI es una herramienta informativa de seguimiento nutricional y no sustituye el diagnóstico ni la prescripción de un médico o dietista-nutricionista colegiado. Las fotografías se procesan de forma segura sin exponer claves API en el navegador.
+          </p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <a href="/api/export?format=json" class="btn-sm" download>📦 Descargar mis datos (RGPD)</a>
+            <button type="button" id="btn-delete-account" class="btn-sm" style="border-color:var(--danger); color:var(--danger);">
+              🗑️ Eliminar mi cuenta y datos
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="disclaimer-footer">
+        NutriVital AI · Basado en tablas nutricionales verificadas BEDCA y USDA FoodData Central · Directrices saludables de la OMS · Cumplimiento RGPD.
+      </footer>
+    </main>
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR FIJA (5 APARTADOS — SECCIÓN 8) -->
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button type="button" class="nav-item active" data-screen="dashboard" id="nav-btn-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Inicio</span>
+      </button>
+
+      <button type="button" class="nav-item" data-screen="history" id="nav-btn-history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span>Historial</span>
+      </button>
+
+      <button type="button" class="nav-item nav-item-camera" data-screen="camera" id="nav-btn-camera" aria-label="Registrar comida con cámara">
+        <div class="nav-camera-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+            <circle cx="12" cy="13" r="3.5"/>
+          </svg>
+        </div>
+        <span style="color:var(--primary); font-weight:800;">Registrar</span>
+      </button>
+
+      <button type="button" class="nav-item" data-screen="stats" id="nav-btn-stats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <span>Estadísticas</span>
+      </button>
+
+      <button type="button" class="nav-item" data-screen="profile" id="nav-btn-profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Mi perfil</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MODAL: BIENVENIDA, INICIO DE SESIÓN Y ASISTENTE DE CONFIGURACIÓN INICIAL (SECCIÓN 2) -->
+  <div id="modal-onboarding" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+    <div class="modal-sheet">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 id="onboarding-title" class="card-title">🌱 Bienvenido a NutriVital AI</h2>
+        <button type="button" id="btn-close-onboarding" class="icon-btn" aria-label="Cerrar ventana">✕</button>
+      </div>
+
+      <div class="mode-tabs" style="grid-template-columns: 1fr 1fr;">
+        <button type="button" class="mode-tab-btn active" id="tab-auth-wizard">✨ Nuevo Perfil / Asistente</button>
+        <button type="button" class="mode-tab-btn" id="tab-auth-login">🔐 Iniciar Sesión</button>
+      </div>
+
+      <!-- Formulario de Asistente Inicial con previsualización metabólica en tiempo real -->
+      <form id="form-onboarding-wizard" class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nombre</label>
+          <input type="text" id="wiz-name" class="form-control" value="Carlos Gómez" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <input type="email" id="wiz-email" class="form-control" placeholder="tu@correo.es" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Edad</label>
+          <input type="number" id="wiz-age" class="form-control" value="34" min="12" max="100" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sexo biológico</label>
+          <select id="wiz-sex" class="form-control">
+            <option value="male">Hombre</option>
+            <option value="female">Mujer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Altura (cm)</label>
+          <input type="number" id="wiz-height" class="form-control" value="176" min="120" max="230" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Peso actual (kg)</label>
+          <input type="number" step="0.1" id="wiz-weight" class="form-control" value="78.5" min="30" max="250" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Peso objetivo opcional (kg)</label>
+          <input type="number" step="0.1" id="wiz-target-weight" class="form-control" value="73.0" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Objetivo personal</label>
+          <select id="wiz-goal" class="form-control">
+            <option value="lose" selected>Perder peso de forma progresiva</option>
+            <option value="maintain">Mantener mi peso actual</option>
+            <option value="gain">Ganar peso</option>
+            <option value="improve_habits">Mejorar mis hábitos alimenticios</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Nivel de actividad física diaria</label>
+          <select id="wiz-activity" class="form-control">
+            <option value="sedentary">Sedentario: poca actividad física</option>
+            <option value="light">Ligero: actividad física ocasional</option>
+            <option value="moderate" selected>Moderado: ejercicio entre 3 y 5 días por semana</option>
+            <option value="high">Alto: ejercicio intenso y frecuente</option>
+            <option value="very_high">Muy alto: actividad física o trabajo físico muy exigente</option>
+          </select>
+        </div>
+
+        <!-- Previsualización instantánea de IMC, TMB, GET y Calorías Objetivo -->
+        <div class="form-group full" id="wiz-live-preview" style="background:var(--primary-soft); padding:12px; border-radius:12px; border:1px solid var(--border); font-size:0.8rem;">
+          Calculando tus necesidades energéticas...
+        </div>
+
+        <div class="form-group full">
+          <label style="display:flex; gap:8px; align-items:flex-start; font-size:0.77rem; color:var(--text-secondary); cursor:pointer;">
+            <input type="checkbox" id="wiz-gdpr-consent" checked required style="margin-top:3px;" />
+            <span>Acepto el Consentimiento Informado RGPD y entiendo que esta aplicación ofrece estimaciones orientativas y no sustituye el consejo médico o de un dietista-nutricionista.</span>
+          </label>
+        </div>
+
+        <div class="form-group full">
+          <button type="submit" class="cta-photo-primary" style="margin-top:0;">
+            🚀 CREAR MI PLAN PERSONALIZADO
+          </button>
+        </div>
+      </form>
+
+      <!-- Formulario de Login -->
+      <form id="form-login" class="form-grid" style="display:none;">
+        <div class="form-group full">
+          <label class="form-label">Correo electrónico</label>
+          <input type="email" id="login-email" class="form-control" value="elena@nutrivital.es" required />
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Contraseña</label>
+          <input type="password" id="login-password" class="form-control" value="Nutri2026!" required />
+        </div>
+        <div class="form-group full">
+          <button type="submit" class="cta-photo-primary" style="margin-top:0;">
+            Entrar en mi cuenta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALLE Y EDICIÓN DE UNA COMIDA REGISTRADA -->
+  <div id="modal-meal-detail" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-sheet">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="modal-meal-title" class="card-title">Detalle de la comida</h3>
+        <button type="button" id="btn-close-meal-modal" class="icon-btn">✕</button>
+      </div>
+      <div id="modal-meal-body" style="display:flex; flex-direction:column; gap:12px;"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

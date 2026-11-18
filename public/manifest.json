@@ -1,0 +1,19 @@
+{
+  "name": "NutriVital AI — Control Inteligente de Calorías",
+  "short_name": "NutriVital AI",
+  "description": "Asistente nutricional inteligente con reconocimiento fotográfico por IA, motor metabólico Mifflin-St Jeor, base de datos BEDCA/USDA y recomendaciones oficiales de la OMS.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8FAFC",
+  "theme_color": "#16A34A",
+  "lang": "es-ES",
+  "icons": [
+    {
+      "src": "/assets/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

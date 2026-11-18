@@ -1,0 +1,1135 @@
+/* ==========================================================================
+   NUTRIVITAL AI — SISTEMA DE DISEÑO VISUAL MOBILE-FIRST & BIENESTAR
+   Paleta orgánica de salud y nutrición + Modo Oscuro + Accesibilidad
+   ========================================================================== */
+
+:root {
+  /* Paleta de colores oficial (Sección 8) */
+  --primary: #16A34A;
+  --primary-hover: #15803D;
+  --primary-active: #166534;
+  --primary-light: #DCFCE7;
+  --primary-soft: #F0FDF4;
+  --positive: #22C55E;
+
+  --bg-main: #FFFFFF;
+  --bg-app: #F4F7F5;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F8FAFC;
+  --bg-muted: #F1F5F9;
+
+  --text-main: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+
+  --warning: #F59E0B;
+  --warning-bg: #FEF3C7;
+  --warning-text: #92400E;
+
+  --danger: #EF4444;
+  --danger-bg: #FEE2E2;
+  --danger-text: #991B1B;
+
+  --info: #0284C7;
+  --info-bg: #E0F2FE;
+  --info-text: #075985;
+
+  /* Macronutrientes */
+  --macro-protein: #0D9488;
+  --macro-carbs: #F59E0B;
+  --macro-fat: #EA580C;
+  --macro-fiber: #16A34A;
+  --macro-water: #0284C7;
+
+  --border: #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 32px -8px rgba(22, 163, 74, 0.16);
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --nav-height: 76px;
+  --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+  --primary: #22C55E;
+  --primary-hover: #16A34A;
+  --primary-light: rgba(34, 197, 94, 0.16);
+  --primary-soft: rgba(34, 197, 94, 0.08);
+  --positive: #4ADE80;
+
+  --bg-main: #0B1310;
+  --bg-app: #080E0C;
+  --bg-card: #121D18;
+  --bg-subtle: #172620;
+  --bg-muted: #1E3028;
+
+  --text-main: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+
+  --warning-bg: rgba(245, 158, 11, 0.16);
+  --warning-text: #FCD34D;
+
+  --danger-bg: rgba(239, 68, 68, 0.16);
+  --danger-text: #FCA5A5;
+
+  --info-bg: rgba(2, 132, 199, 0.16);
+  --info-text: #7DD3FC;
+
+  --border: #1E3229;
+  --border-strong: #2A4438;
+
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  font-size: 15px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+/* Contenedor principal Mobile-First con soporte para pantallas anchas */
+.app-shell {
+  max-width: 540px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: var(--bg-main);
+  box-shadow: 0 0 45px rgba(15, 23, 42, 0.07);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-bottom: calc(var(--nav-height) + 24px);
+}
+
+@media (min-width: 960px) {
+  .app-shell.wide-mode {
+    max-width: 1040px;
+    border-radius: var(--radius-xl);
+    margin: 18px auto;
+    min-height: calc(100vh - 36px);
+  }
+}
+
+/* Cabecera superior fija */
+.top-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  flex-shrink: 0;
+}
+
+.brand-title {
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text-main);
+  line-height: 1.15;
+}
+
+.brand-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 1rem;
+}
+
+.icon-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* Barra selectora de fecha */
+.date-navigator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+
+.date-nav-btn {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  padding: 6px 11px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.date-nav-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.date-current-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.date-input-picker {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Contenido principal de cada vista */
+.main-content {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+}
+
+.screen-section {
+  display: none;
+  flex-direction: column;
+  gap: 18px;
+  animation: fadeIn 220ms ease-out;
+}
+
+.screen-section.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tarjetas estándar */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+
+.badge-green {
+  background: var(--primary-light);
+  color: var(--primary-active);
+}
+
+[data-theme="dark"] .badge-green {
+  color: #86EFAC;
+}
+
+.badge-amber {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.badge-red {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.badge-blue {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+/* ==========================================================================
+   HERO PRINCIPAL: CONTADOR CIRCULAR DINÁMICO DE CALORÍAS (SECCIÓN 5)
+   ========================================================================== */
+
+.calorie-hero-card {
+  background: linear-gradient(155deg, var(--bg-card) 0%, var(--primary-soft) 100%);
+  border: 1px solid color-mix(in srgb, var(--primary) 26%, var(--border));
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.hero-ring-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+@media (min-width: 440px) {
+  .hero-ring-layout {
+    grid-template-columns: 190px 1fr;
+  }
+}
+
+.ring-wrapper {
+  position: relative;
+  width: 184px;
+  height: 184px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-svg {
+  width: 184px;
+  height: 184px;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 14;
+}
+
+.ring-progress {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 14;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 650ms cubic-bezier(0.22, 1, 0.36, 1), stroke 300ms ease;
+}
+
+.ring-center-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+}
+
+.ring-remaining-value {
+  font-family: var(--font-mono);
+  font-size: 1.95rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--text-main);
+}
+
+.ring-remaining-unit {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  margin-top: 3px;
+}
+
+.ring-pct-pill {
+  margin-top: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.calorie-stats-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calorie-stat-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calorie-stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.calorie-stat-number {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* Botón estrella: FOTOGRAFIAR MI COMIDA */
+.cta-photo-primary {
+  width: 100%;
+  margin-top: 14px;
+  padding: 15px 20px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #16A34A 0%, #059669 100%);
+  color: #FFFFFF;
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+}
+
+.cta-photo-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.cta-photo-primary:active {
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   TARJETAS DE MACRONUTRIENTES E INDICADORES SECUNDARIOS
+   ========================================================================== */
+
+.macros-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.macro-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.macro-name {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.macro-value {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.macro-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 7px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 400ms ease;
+}
+
+/* Tarjeta de hidratación y contadores rápidos */
+.secondary-metrics-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 420px) {
+  .secondary-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.water-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-sm {
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-sm:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-sm-primary {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary);
+}
+
+.btn-sm-primary:hover {
+  background: var(--primary-hover);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   CRONOLOGÍA VISUAL DE COMIDAS DEL DÍA
+   ========================================================================== */
+
+.meals-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.meal-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 74px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.meal-card:hover {
+  border-color: var(--primary);
+}
+
+.meal-thumb {
+  width: 74px;
+  height: 74px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+}
+
+.meal-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meal-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.meal-type-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--primary-light);
+  color: var(--primary-active);
+}
+
+[data-theme="dark"] .meal-type-tag {
+  color: #86EFAC;
+}
+
+.meal-time-text {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.meal-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meal-macros-inline {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.meal-right-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.meal-kcal-badge {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.meal-actions-row {
+  display: flex;
+  gap: 5px;
+}
+
+/* ==========================================================================
+   CONSEJOS INTELIGENTES Y RECOMENDACIONES OMS (SECCIÓN 6)
+   ========================================================================== */
+
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tip-banner {
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.tip-banner.positive {
+  background: var(--primary-soft);
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+}
+
+.tip-banner.warning {
+  background: var(--warning-bg);
+  border-color: color-mix(in srgb, var(--warning) 40%, var(--border));
+}
+
+.tip-banner.alert {
+  background: var(--danger-bg);
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--border));
+}
+
+.tip-banner.info {
+  background: var(--info-bg);
+  border-color: color-mix(in srgb, var(--info) 35%, var(--border));
+}
+
+.tip-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.tip-message {
+  font-size: 0.79rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.who-indicators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.who-indicator-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.who-indicator-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   PANTALLA DE CÁMARA, ANÁLISIS IA Y TABLA DE CONFIRMACIÓN (SECCIÓN 4)
+   ========================================================================== */
+
+.mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: var(--bg-subtle);
+  padding: 5px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.mode-tab-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 9px 8px;
+  border-radius: 11px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.mode-tab-btn.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.camera-stage {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #0F172A;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border);
+}
+
+.camera-stage video,
+.camera-stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-frame-guide {
+  position: absolute;
+  inset: 18px;
+  border: 2px dashed rgba(255, 255, 255, 0.55);
+  border-radius: 16px;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+}
+
+.camera-guide-label {
+  background: rgba(15, 23, 42, 0.72);
+  color: #FFFFFF;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.sample-plates-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.sample-plate-btn {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sample-plate-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.sample-plate-btn img {
+  width: 100%;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.sample-plate-btn span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+}
+
+/* Tabla editable de alimentos detectados por IA */
+.ai-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ai-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.ai-items-table th {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 2px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ai-items-table td {
+  padding: 10px 6px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.grams-input {
+  width: 72px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.84rem;
+  text-align: right;
+}
+
+.quick-Condiments-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   FORMULARIOS, PERFIL Y CONFIGURACIÓN INICIAL
+   ========================================================================== */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 420px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 11px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: border-color var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ==========================================================================
+   NAVEGACIÓN INFERIOR FIJA PARA MÓVIL (5 APARTADOS — SECCIÓN 8)
+   ========================================================================== */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 540px;
+  height: var(--nav-height);
+  background: color-mix(in srgb, var(--bg-card) 95%, transparent);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  padding: 0 8px;
+  z-index: 50;
+}
+
+@media (min-width: 960px) {
+  .app-shell.wide-mode .bottom-nav {
+    max-width: 1040px;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  }
+}
+
+.nav-item {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  transition: color var(--transition);
+}
+
+.nav-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+.nav-item.active {
+  color: var(--primary);
+}
+
+/* Botón central destacado: Registrar Comida / Cámara */
+.nav-item-camera {
+  position: relative;
+  top: -12px;
+}
+
+.nav-camera-circle {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #16A34A 0%, #059669 100%);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(22, 163, 74, 0.38);
+  border: 3px solid var(--bg-card);
+  transition: transform var(--transition);
+}
+
+.nav-item-camera:hover .nav-camera-circle {
+  transform: scale(1.06);
+}
+
+/* ==========================================================================
+   MODALES (BIENVENIDA, ASISTENTE INICIAL, DETALLE DE COMIDA, RGPD)
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(5px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
+.modal-sheet {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 22px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Toast de notificación en tiempo real */
+.toast-container {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 92%;
+  max-width: 440px;
+  pointer-events: none;
+}
+
+.toast-msg {
+  background: #0F172A;
+  color: #FFFFFF;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  animation: fadeIn 200ms ease-out;
+}
+
+/* Gráficos SVG responsivos */
+.chart-svg-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.disclaimer-footer {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+  line-height: 1.45;
+}
